@@ -14,32 +14,40 @@ Realtek's code dump contained a kernel driver and a special driver for hostapd. 
 
 The hostapd driver however, wasn't provided as a driver. A modified hostapd, somewhere in its 0.8.x version, was dumped. If you wanted a newer hostapd, well, too bad.
 
-This repo has the extracted modifications to mainline hostapd done by Realtek, adapted for hostapd 2.2. It is very likely that these would work with hostapd 2.x.
+This repo has the extracted modifications to mainline hostapd done by Realtek, adapted for hostapd 2.6. For other versions of hostapd, checkout to the corresponding tag.
 
 ## Installation
 ----
 
-Get a fresh copy of hostapd from http://hostap.epitest.fi/hostapd/ or through your distro's methods.
+Get a fresh copy of hostapd source from your distro or from http://w1.fi/hostapd/; I suggest the former, but if you have reason to use the latter, go ahead.
+
+**Make sure you can build hostapd before proceeding.**
+
 Inside the directory that contains `hostapd`, `src`, `wpa_supplicant`, apply the patch:
 ```
-$ patch -Np1 -i </path/to/rtl871xdrv.patch>
+$ patch -Np1 -i </path/to/rtlxdrv.patch>
 ```
 
-Copy the `driver_rtl.h` and `driver_rtw.c` files into `src/drivers/`
+Make sure you enable the driver in `.config`.
+```
+$ echo CONFIG_DRIVER_RTW=y >> .config
+```
 
-Copy the `.config` file to `hostapd/.config`. You may try editting and augmenting `.config` with other options, but bear in mind that nothing other than the provided settings in `.config` (provided by Realtek, they are) have been tested.
+Credits: [oblique](https://github.com/pritambaral/hostapd-rtl871xdrv/pull/3#issuecomment-76276806)
 
-Now you're all set to compile. Use your distro's build system, if set up, to compile and package and everything.
+*(If you don't know what `.config` is, then you haven't built vanilla hostapd yet. You should have been able to do it before applying the patch.)*
 
-For simple compiling: change into the `hostapd` directory, the same one you just copied `.config` into, and run `make`.
-
-If `make` succeeds, you'll have two binaries in the same directory: `hostapd` and `hostapd_cli`. The former is the actual AP daemon, the latter is just a helper for controlling a running daemon.
+Now you're all set. Rebuild hostapd and use.
 
 A simple `hostapd.conf` file has been provided.
 
+## Why only hostapd, no wpa_supplicant?
+
+At the time of releasing this, the mainline driver worked well enough for STA mode operation. The kernel driver from Realtek was only needed for AP mode.
+
 ## LICENSE
 ----
-No code here has been written by me, only existing code from Realtek has been modified. As per the original license:
+Little code here has been written by me, most of the code comes from Realtek's source dump. As per the original license:
 
 ```
 This program is free software; you can redistribute it and/or modify
